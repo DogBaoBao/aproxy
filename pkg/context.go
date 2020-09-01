@@ -3,6 +3,7 @@ package pkg
 import (
 	"bytes"
 	"encoding/gob"
+	"encoding/json"
 	"math"
 	"net/http"
 )
@@ -143,7 +144,7 @@ func (hc *HttpContext) WriteSuccess() {
 }
 
 func (hc *HttpContext) WriteResponse(resp Response) {
-	hc.doWriteJSON(nil, http.StatusOK, resp)
+	hc.doWriteJSON(nil, http.StatusOK, resp.data)
 }
 
 func (hc *HttpContext) doWriteJSON(h map[string]string, code int, d interface{}) {
@@ -162,7 +163,7 @@ func (hc *HttpContext) doWrite(h map[string]string, code int, d interface{}) {
 	hc.Writer.WriteHeader(code)
 
 	if d != nil {
-		if b, err := GetBytes(d); err != nil {
+		if b, err := json.Marshal(d); err != nil {
 			hc.Writer.Write([]byte(err.Error()))
 		} else {
 			hc.Writer.Write(b)

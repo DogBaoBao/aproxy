@@ -34,6 +34,8 @@ func (p *Proxy) Start() {
 }
 
 func (p *Proxy) beforeStart() {
+	pkg.NewDubboClient().Init()
+
 	// TODO mock api register
 	ads := pkg.GetMustApiDiscoveryService(pkg.ApiDiscoveryService_Dubbo)
 

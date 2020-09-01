@@ -13,14 +13,9 @@ import (
 )
 
 import (
-	_ "github.com/apache/dubbo-go/cluster/cluster_impl"
-	_ "github.com/apache/dubbo-go/cluster/loadbalance"
 	"github.com/apache/dubbo-go/common/constant"
 	dg "github.com/apache/dubbo-go/config"
-	_ "github.com/apache/dubbo-go/filter/filter_impl"
 	"github.com/apache/dubbo-go/protocol/dubbo"
-	_ "github.com/apache/dubbo-go/registry/protocol"
-	_ "github.com/apache/dubbo-go/registry/zookeeper"
 )
 
 // TODO java class name elem
@@ -84,21 +79,23 @@ func (dc *DubboClient) Call(r *Request) (resp Response, err error) {
 			var s string
 			if err := json.Unmarshal(r.Body, &s); err != nil {
 				logger.Errorf("params parse error:%+v", err)
+			} else {
+				reqData = append(reqData, s)
 			}
-			reqData = append(reqData, s)
 		case JavaLangClassName:
 			var i int
 			if err := json.Unmarshal(r.Body, &i); err != nil {
 				logger.Errorf("params parse error:%+v", err)
+			} else {
+				reqData = append(reqData, i)
 			}
-			reqData = append(reqData, i)
 		default:
 			bodyMap := make(map[string]interface{})
 			if err := json.Unmarshal(r.Body, &bodyMap); err != nil {
 				return *EmptyResponse, err
+			} else {
+				reqData = append(reqData, bodyMap)
 			}
-
-			reqData = append(reqData, bodyMap)
 		}
 	case l > 1:
 		if err = json.Unmarshal(r.Body, &reqData); err != nil {
@@ -106,14 +103,13 @@ func (dc *DubboClient) Call(r *Request) (resp Response, err error) {
 		}
 	}
 
-	logger.Infof("invoke, method:%v, types:%v, reqData:%v", dm.Method, dm.Types, reqData)
+	logger.Debugf("[dubbogo proxy] invoke, method:%v, types:%v, reqData:%v", dm.Method, dm.Types, reqData)
 
 	if resp, err := gs.Invoke(context.Background(), []interface{}{dm.Method, dm.Types, reqData}); err != nil {
-		logger.Errorf("invoke error:%+v", err)
 		return *EmptyResponse, err
 	} else {
-		logger.Infof("resp:%v", resp)
-		return *EmptyResponse, nil
+		logger.Debugf("[dubbogo proxy] dubbo client resp:%v", resp)
+		return *NewResponse(resp), nil
 	}
 }
 
@@ -151,6 +147,7 @@ func (dc *DubboClient) create(interfaceName, version, group string, dm *DubboMet
 	}
 
 	referenceConfig.Version = version
+	referenceConfig.Group = group
 	referenceConfig.Generic = true
 	if dm.Retries == "" {
 		referenceConfig.Retries = "3"

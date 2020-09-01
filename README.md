@@ -6,7 +6,7 @@
 
 先提两个点：
 
-配置文件 
+#### 配置文件 
 - aproxy/configs/client.yml 项目配置
 - aproxy/configs/api_config.yaml 里面是Api配置
 
@@ -14,12 +14,56 @@
 
 因为现在没有接口配置，暂时接口配置写死在代码
 
+> API 配置
+
 proxy_start.go#beforeStart() 里面配一些自己的 dubbo 接口元数据
 
-启动的时候在你的编辑器里面加
+#### IDE启动
 
 程序参数
 -c /Users/tc/Documents/workspace_2020/aproxy/configs/conf.yaml
 
 环境变量
 CONF_CONSUMER_FILE_PATH=/Users/tc/Documents/workspace_2020/aproxy/configs/client.yml;APP_LOG_CONF_FILE=/Users/tc/Documents/workspace_2020/aproxy/configs/log.yml
+
+### sample
+
+#### 发送单参数请求
+
+> 请求头 X-DGP-WAY:dubbo，和配置文件对应
+
+url: http://127.0.0.1:8888/api/v1/test-dubbo/getUserByName
+
+body:
+```json
+"tiecheng"
+```
+
+response:
+```json
+{
+    "id": "3213",
+    "name": "tiecheng",
+    "age": 25
+}
+```
+
+url: http://127.0.0.1:8888/api/v1/test-dubbo/user
+
+body:
+```json
+{
+    "id": "3213",
+    "name": "tiecheng",
+    "age": 25
+}
+```
+
+response:
+```json
+{
+    "age": 25,
+    "id": "3213",
+    "name": "tiecheng"
+}
+```

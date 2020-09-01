@@ -5,6 +5,14 @@ import (
 	"io/ioutil"
 )
 
+import (
+	_ "github.com/apache/dubbo-go/cluster/cluster_impl"
+	_ "github.com/apache/dubbo-go/cluster/loadbalance"
+	_ "github.com/apache/dubbo-go/filter/filter_impl"
+	_ "github.com/apache/dubbo-go/registry/protocol"
+	_ "github.com/apache/dubbo-go/registry/zookeeper"
+)
+
 func init() {
 	AddFilterFunc(HttpTransferDubboFilter, HttpDubbo())
 }
@@ -27,11 +35,12 @@ func doDubbo(c *HttpContext) {
 			api.Client = SingleDubboClient()
 		}
 
-		if _, err := api.Client.Call(NewRequest(bytes, api)); err != nil {
+		if resp, err := api.Client.Call(NewRequest(bytes, api)); err != nil {
 			logger.Errorf("[dubboproxy go] client do err:%v!", err)
 			c.WriteFail()
 			c.Abort()
 		} else {
+			c.WriteResponse(resp)
 			c.Next()
 		}
 	}

@@ -3,23 +3,24 @@
 
 check: true
 # client
-request_timeout : "10s"
+request_timeout: "10s"
 # connect timeout
-connect_timeout : "3s"
+connect_timeout: "3s"
 
 # application config
 application:
-  organization : "dubbogo"
-  name  : "dubbo-go-proxy"
-  module : "dubbo-go-proxy"
-  version : "1.0.0"
-  owner : "PTY"
-  environment : "dev"
+  organization: "dubbogo"
+  name: "dubbo-go-proxy"
+  module: "dubbo-go-proxy"
+  version: "1.0.0"
+  group: "test"
+  owner: "PTY"
+  environment: "dev"
 
-registries :
+registries:
   "zk_1":
     protocol: "zookeeper"
-    timeout	: "3s"
+    timeout: "3s"
     address: "127.0.0.1:2182"
     username: ""
     password: ""
